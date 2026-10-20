@@ -1,0 +1,28 @@
+name: veo-watchdog
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # every 5 minutes
+  workflow_dispatch:          # allow manual run for testing
+
+permissions:
+  contents: write             # needed to remember state between runs
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: run watchdog
+        env:
+          FALIX_KEY: ${{ secrets.FALIX_KEY }}
+          FALIX_KEY2: ${{ secrets.FALIX_KEY2 }}
+          BH_KEY: ${{ secrets.BH_KEY }}
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT: ${{ secrets.TG_CHAT }}
+          GHTOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHREPO: ${{ github.repository }}
+        run: node watchdog.js
