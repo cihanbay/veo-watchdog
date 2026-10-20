@@ -120,13 +120,20 @@ async function runChecks(state) {
   await watchServer("veosmp", "https://veosmp.falix.org", FALIX_KEY2, "3513528", state, "none");
   await watchServer("bot-hosting", "https://79pzovvqil.apps.bot-hosting.cloud", BH_KEY, null, state, "bh");
 
-  /* HidenCloud free-slot detector */
+  /* HidenCloud free-slot detector (per-location: a single free spot counts) */
   try {
     const r = await raw("https://dash.hidencloud.com/store/view/349");
     const t = await r.text();
-    const valid = t.includes("Location");
-    const hasSlot = valid && !t.includes("This location is full and unavailable");
-    if (hasSlot && state.hiden !== "open") { state.hiden = "open"; stateChanged = true; await tg("🎯 HidenCloud FREE SLOT AVAILABLE — go now: https://dash.hidencloud.com/store/view/349"); }
+    const names = ["Virginia, US", "Paris, FR", "Singapore, SG", "Queretaro, MX", "Pune, IN", "Sydney, AU", "Dubai, AE"];
+    let freeName = null;
+    for (const n of names) {
+      const idx = t.indexOf(n);
+      if (idx === -1) continue;
+      const windowText = t.slice(idx, idx + 140);
+      if (!windowText.includes("full and unavailable")) { freeName = n; break; }
+    }
+    const hasSlot = freeName !== null;
+    if (hasSlot && state.hiden !== "open") { state.hiden = "open"; state.hidenName = freeName; stateChanged = true; await tg(`🎯 HidenCloud FREE SLOT AVAILABLE (${freeName}) — go now: https://dash.hidencloud.com/store/view/349`); }
     if (!hasSlot && state.hiden === "open") { state.hiden = "closed"; stateChanged = true; }
   } catch {}
 }
