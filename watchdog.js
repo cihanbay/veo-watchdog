@@ -115,11 +115,7 @@ async function watchServer(name, url, key, sid, state, powerable) {
   }
 }
 
-(async () => {
-  if (!FALIX_KEY || !BH_KEY || !TG_TOKEN) { console.log("secrets missing — skipping"); return; }
-  const state = await readState();
-  stateChanged = false;
-
+async function runChecks(state) {
   await watchServer("netcheckgate", "https://netcheckgate.falix.org", FALIX_KEY, "3511712", state, "falix-toggle");
   await watchServer("veosmp", "https://veosmp.falix.org", FALIX_KEY2, "3513528", state, "none");
   await watchServer("bot-hosting", "https://79pzovvqil.apps.bot-hosting.cloud", BH_KEY, null, state, "bh");
@@ -133,8 +129,30 @@ async function watchServer(name, url, key, sid, state, powerable) {
     if (hasSlot && state.hiden !== "open") { state.hiden = "open"; stateChanged = true; await tg("🎯 HidenCloud FREE SLOT AVAILABLE — go now: https://dash.hidencloud.com/store/view/349"); }
     if (!hasSlot && state.hiden === "open") { state.hiden = "closed"; stateChanged = true; }
   } catch {}
+}
 
+(async () => {
+  if (!FALIX_KEY || !BH_KEY || !TG_TOKEN) { console.log("secrets missing — skipping"); return; }
+
+  /* long-runner: check every 60s for ~4.8h, then exit; cron starts the next loop */
+  const state = await readState();
+  const started = Date.now();
+  const WINDOW = 290 * 60 * 1000;
+  let tick = 0;
+  while (Date.now() - started < WINDOW) {
+    tick++;
+    stateChanged = false;
+    const state0 = JSON.stringify(state);
+
+    await runChecks(state);
+
+    if (JSON.stringify(state) !== state0) await writeState(state);
+
+    console.log(`tick ${tick} done — next in 60s`);
+    const remaining = WINDOW - (Date.now() - started);
+    if (remaining > 0) await new Promise((r) => setTimeout(r, Math.min(60000, remaining)));
+  }
   await writeState(state);
-  console.log("watchdog run complete");
+  console.log("watchdog window complete — cron will restart");
   process.exit(0);
 })().catch((e) => { console.error("watchdog error:", e.message); process.exit(0); });
