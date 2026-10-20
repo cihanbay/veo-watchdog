@@ -105,13 +105,18 @@ async function watchServer(name, url, key, sid, state, powerable) {
     const c2 = await health(url);
     if (c2.ok) fixed = true;
   }
-  /* notify on transitions only */
-  if (fixed) {
-    state[name] = "up"; state[name + "Alerted"] = false; stateChanged = true;
-    await tg(`🛠 ${name}: auto-fixed and back UP (${url})`);
-  } else if (st !== "down" || !state[name + "Alerted"]) {
-    state[name] = "down"; state[name + "Alerted"] = true; stateChanged = true;
-    await tg(`🚨 ${name}: DOWN (${c.why})${manual ? " — " + manual : ""} (${url})`);
+  /* notify on EVERY down event (deduped with a 10-min gap) */
+  const nowTs = Date.now();
+  const last = state[name + "LastNotify"] || 0;
+  if (nowTs - last > 10 * 60 * 1000) {
+    state[name] = "down";
+    state[name + "Alerted"] = true;
+    state[name + "LastNotify"] = nowTs;
+    stateChanged = true;
+    await tg(`🚨 ${name}: DOWN (${c.why})${manual ? " — " + manual : ""} — auto-repair attempted${fixed ? " and SUCCESSFUL" : ""} (${url})`);
+  } else {
+    state[name] = "down";
+    if (fixed) { await tg(`🛠 ${name}: auto-fixed and back UP (${url})`); state[name] = "up"; }
   }
 }
 
@@ -139,7 +144,7 @@ async function runChecks(state) {
 }
 
 (async () => {
-  if (!FALIX_KEY || !BH_KEY || !TG_TOKEN) { console.log("secrets missing — skipping"); return; }
+  if (!FALIX_KEY || !BH_KEY || !TG_TOKEN) { console.error("secrets missing"); process.exit(1); }
 
   /* long-runner: check every 60s for ~4.8h, then exit; cron starts the next loop */
   const state = await readState();
@@ -162,4 +167,4 @@ async function runChecks(state) {
   await writeState(state);
   console.log("watchdog window complete — cron will restart");
   process.exit(0);
-})().catch((e) => { console.error("watchdog error:", e.message); process.exit(0); });
+})().catch((e) => { console.error("watchdog error:", e.message); process.exit(1); });
