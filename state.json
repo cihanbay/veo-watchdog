@@ -1,5 +1,8 @@
 {
   "netcheckgate": "up",
   "netcheckgateAlerted": false,
-  "netcheckgateLastNotify": 1792581666708
+  "netcheckgateLastNotify": 1792581666708,
+  "bot-hosting": "down",
+  "bot-hostingAlerted": true,
+  "bot-hostingLastNotify": 1792605633668
 }
