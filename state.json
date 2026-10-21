@@ -1,5 +1,5 @@
 {
-  "netcheckgate": "down",
-  "netcheckgateAlerted": true,
+  "netcheckgate": "up",
+  "netcheckgateAlerted": false,
   "netcheckgateLastNotify": 1792581666708
 }
