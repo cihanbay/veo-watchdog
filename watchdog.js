@@ -124,6 +124,7 @@ async function runChecks(state) {
   await watchServer("netcheckgate", "https://netcheckgate.falix.org", FALIX_KEY, "3511712", state, "falix-toggle");
   await watchServer("veosmp", "https://veosmp.falix.org", FALIX_KEY2, "3513528", state, "none");
   await watchServer("bot-hosting", "https://79pzovvqil.apps.bot-hosting.cloud", BH_KEY, null, state, "bh");
+  await watchServer("hidencloud", "https://veosmp.hidenplay.net", null, null, state, "none");
 
   /* HidenCloud free-slot detector (per-location: a single free spot counts) */
   try {
