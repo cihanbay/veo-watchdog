@@ -8,7 +8,7 @@
   "veosmp": "up",
   "veosmpAlerted": false,
   "veosmpLastNotify": 1793016520394,
-  "hidencloud": "up",
-  "hidencloudAlerted": false,
-  "hidencloudLastNotify": 1792849224229
+  "hidencloud": "down",
+  "hidencloudAlerted": true,
+  "hidencloudLastNotify": 1793033726990
 }
