@@ -1,5 +1,5 @@
 {
-  "netcheckgate": "down",
+  "netcheckgate": "up",
   "netcheckgateAlerted": true,
   "netcheckgateLastNotify": 1793083867721,
   "bot-hosting": "up",
@@ -10,5 +10,5 @@
   "veosmpLastNotify": 1793016520394,
   "hidencloud": "down",
   "hidencloudAlerted": true,
-  "hidencloudLastNotify": 1793083560716
+  "hidencloudLastNotify": 1793084233821
 }
