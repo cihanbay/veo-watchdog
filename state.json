@@ -5,9 +5,9 @@
   "bot-hosting": "up",
   "bot-hostingAlerted": false,
   "bot-hostingLastNotify": 1793021269690,
-  "veosmp": "up",
-  "veosmpAlerted": false,
-  "veosmpLastNotify": 1793091852971,
+  "veosmp": "down",
+  "veosmpAlerted": true,
+  "veosmpLastNotify": 1793167131770,
   "hidencloud": "down",
   "hidencloudAlerted": true,
   "hidencloudLastNotify": 1793166866416
