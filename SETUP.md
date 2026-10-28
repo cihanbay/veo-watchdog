@@ -3,7 +3,6 @@
 A GitHub Actions bot that runs **every 5 minutes** and:
 - 🔔 Telegram-messages you the moment any server goes DOWN (and when it's back)
 - 🛠 **auto-fixes**: Falix 502 (proxy toggle), Bot-Hosting offline (auto power-start)
-- 🎯 alerts when a **HidenCloud free slot** opens (within 5 minutes)
 - quietly skips jahan auto-start (Falix policy — it only notifies)
 
 ---
@@ -46,5 +45,4 @@ In the repo: **Add file → Create new file** — type the full path to create f
 ## Alerts you'll receive on Telegram
 
 - `🚨 netcheckgate: DOWN (…) — auto-repair attempted` → and `🛠 …auto-fixed and back UP`
-- `🎯 HidenCloud FREE SLOT AVAILABLE — go now: …`
 - Jahan-down alerts include `needs manual Start on the dashboard (captcha)` when only you can fix it.
