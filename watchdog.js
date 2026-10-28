@@ -1,8 +1,7 @@
 /* Veo watchdog — GitHub Actions cron (every 5 min)
    - pings the 3 server /health endpoints
    - auto-fixes: Falix 502 → proxy toggle; Bot-Hosting offline → power start
-   - notifies Telegram on state changes (no spam — only transitions)
-   - HidenCloud free-slot detector → urgent Telegram ping                 */
+   - notifies Telegram on state changes (no spam — only transitions)            */
 const fs = require("fs");
 
 const FALIX_KEY = process.env.FALIX_KEY;     // netcheckgate account
@@ -124,24 +123,8 @@ async function runChecks(state) {
   await watchServer("netcheckgate", "https://netcheckgate.falix.org", FALIX_KEY, "3511712", state, "falix-toggle");
   await watchServer("veosmp", "https://veosmp.falix.org", FALIX_KEY2, "3513528", state, "none");
   await watchServer("bot-hosting", "https://79pzovvqil.apps.bot-hosting.cloud", BH_KEY, null, state, "bh");
-  await watchServer("hidencloud", "https://veosmp.hidenplay.net", null, null, state, "none");
 
-  /* HidenCloud free-slot detector (per-location: a single free spot counts) */
-  try {
-    const r = await raw("https://dash.hidencloud.com/store/view/349");
-    const t = await r.text();
-    const names = ["Virginia, US", "Paris, FR", "Singapore, SG", "Queretaro, MX", "Pune, IN", "Sydney, AU", "Dubai, AE"];
-    let freeName = null;
-    for (const n of names) {
-      const idx = t.indexOf(n);
-      if (idx === -1) continue;
-      const windowText = t.slice(idx, idx + 140);
-      if (!windowText.includes("full and unavailable")) { freeName = n; break; }
-    }
-    const hasSlot = freeName !== null;
-    if (hasSlot && state.hiden !== "open") { state.hiden = "open"; state.hidenName = freeName; stateChanged = true; await tg(`🎯 HidenCloud FREE SLOT AVAILABLE (${freeName}) — go now: https://dash.hidencloud.com/store/view/349`); }
-    if (!hasSlot && state.hiden === "open") { state.hiden = "closed"; stateChanged = true; }
-  } catch {}
+  /* HidenCloud dropped by request — free slot detector removed */
 }
 
 (async () => {
