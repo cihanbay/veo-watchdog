@@ -1,7 +1,7 @@
 {
-  "netcheckgate": "up",
-  "netcheckgateAlerted": false,
-  "netcheckgateLastNotify": 1793110919745,
+  "netcheckgate": "down",
+  "netcheckgateAlerted": true,
+  "netcheckgateLastNotify": 1793162471073,
   "bot-hosting": "up",
   "bot-hostingAlerted": false,
   "bot-hostingLastNotify": 1793021269690,
@@ -10,5 +10,5 @@
   "veosmpLastNotify": 1793091852971,
   "hidencloud": "down",
   "hidencloudAlerted": true,
-  "hidencloudLastNotify": 1793161793111
+  "hidencloudLastNotify": 1793162500857
 }
