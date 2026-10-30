@@ -2,7 +2,7 @@
   "netcheckgate": "up",
   "netcheckgateAlerted": false,
   "netcheckgateLastNotify": 1793266037565,
-  "bot-hosting": "down",
+  "bot-hosting": "up",
   "bot-hostingAlerted": false,
   "bot-hostingLastNotify": 1793344116216,
   "veosmp": "down",
