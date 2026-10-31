@@ -80,6 +80,53 @@ async function watchServer(name, url, state) {
 async function runChecks(state) {
   await watchServer("netcheckgate", "https://netcheckgate.falix.org", state);
   await watchServer("bot-hosting", "https://79pzovvqil.apps.bot-hosting.cloud", state);
+  await watchServer("veosmp2", "http://195.201.153.149:20506", state);
+  await watchBotkeep(state);
+}
+
+/* botkeep: primary workload on new account + backup account listing */
+const BK_NEW_KEY = "bk_live_PF9XUw2yVUfGoiwPVWidg4JANL_1s9lVR3WcGkJknaM";
+const BK_NEW_ID = "4a7fdf49-ae6b-4ccd-9f2a-848ca67f13b9";
+const BK_OLD_KEY = "bk_live_ldbMQEnvtF182yiGmFvQv2_Rg4cvWreios7XPgiWaO4";
+async function bkStatus(key, id) {
+  try {
+    const r = await raw(`https://api.botkeep.cloud/api/v1/developer/workloads/${id}`, { headers: { Authorization: `Bearer ${key}`, Accept: "application/json" } });
+    if (r.status === 404) return { missing: true };
+    const j = await r.json();
+    return { status: (j && (j.status || j.state)) || "unknown" };
+  } catch (e) { return { error: e.message || "network" }; }
+}
+async function bkListOld() {
+  try {
+    const r = await raw("https://api.botkeep.cloud/api/v1/developer/workloads", { headers: { Authorization: `Bearer ${BK_OLD_KEY}`, Accept: "application/json" } });
+    const j = await r.json();
+    return ((j && j.data) || []).map((w) => ({ id: w.id, status: w.status || w.state }));
+  } catch { return []; }
+}
+async function watchBotkeep(state) {
+  const p = await bkStatus(BK_NEW_KEY, BK_NEW_ID);
+  const primaryDown = !!p.missing || (p.status !== "running" && !p.error);
+  const old = await bkListOld();
+  const oldRunning = old.filter((w) => w.status === "running");
+  const key = "botkeep";
+  const nowTs = Date.now();
+  const last = state[key + "LastNotify"] || 0;
+  let msg = null;
+  if (primaryDown && oldRunning.length) msg = `🚨 botkeep primary (${BK_NEW_ID.slice(0, 8)}…) is ${p.missing ? "MISSING" : p.status} — backup ${oldRunning[0].id.slice(0, 8)}… is serving`;
+  else if (primaryDown && old.length && !oldRunning.length) msg = `🚨 botkeep primary (${BK_NEW_ID.slice(0, 8)}…) down AND backup stopped — start the backup workload on the old botkeep account`;
+  else if (primaryDown && !old.length) msg = `🚨 botkeep primary (${BK_NEW_ID.slice(0, 8)}…) is ${p.missing ? "MISSING" : p.status} — no backup deployed yet`;
+  else if (!primaryDown && oldRunning.length) msg = `⚠️ BOTH botkeep servers running — Telegram polling conflict; stop the backup`;
+  if (!msg) {
+    if (state[key] === "down") { state[key] = "up"; stateChanged = true; await tg("✅ botkeep primary is back UP"); }
+    state[key] = "up";
+  } else if (nowTs - last > 10 * 60 * 1000) {
+    state[key] = "down";
+    state[key + "LastNotify"] = nowTs;
+    stateChanged = true;
+    await tg(msg);
+  } else {
+    state[key] = "down";
+  }
 }
 
 (async () => {
