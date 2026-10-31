@@ -2,30 +2,27 @@ name: veo-watchdog
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # re-arms the loop; the job itself checks every 60s
-  workflow_dispatch:          # allow manual run for testing
+    - cron: "23 * * * *"   # hourly single-pass check (quota diet)
+  workflow_dispatch:
 
 concurrency:
   group: watchdog
   cancel-in-progress: true
 
 permissions:
-  contents: write             # needed to remember state between runs
+  contents: write
 
 jobs:
   watchdog:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: run watchdog
+      - name: run watchdog (watch + alert only, no repair)
         env:
-          FALIX_KEY: ${{ secrets.FALIX_KEY }}
-          FALIX_KEY2: ${{ secrets.FALIX_KEY2 }}
-          BH_KEY: ${{ secrets.BH_KEY }}
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_CHAT: ${{ secrets.TG_CHAT }}
           GHTOKEN: ${{ secrets.GITHUB_TOKEN }}
