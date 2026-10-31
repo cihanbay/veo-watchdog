@@ -5,7 +5,7 @@
 const fs = require("fs");
 
 const FALIX_KEY = process.env.FALIX_KEY;     // netcheckgate account
-const FALIX_KEY2 = process.env.FALIX_KEY2;   // jahan account
+   // jahan account
 const BH_KEY = process.env.BH_KEY;
 const TG_TOKEN = process.env.TG_TOKEN;
 const TG_CHAT = process.env.TG_CHAT;
@@ -121,7 +121,6 @@ async function watchServer(name, url, key, sid, state, powerable) {
 
 async function runChecks(state) {
   await watchServer("netcheckgate", "https://netcheckgate.falix.org", FALIX_KEY, "3511712", state, "falix-toggle");
-  await watchServer("veosmp", "https://veosmp.falix.org", FALIX_KEY2, "3513528", state, "none");
   await watchServer("bot-hosting", "https://79pzovvqil.apps.bot-hosting.cloud", BH_KEY, null, state, "bh");
 
   /* HidenCloud dropped by request — free slot detector removed */
