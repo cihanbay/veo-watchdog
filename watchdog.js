@@ -80,7 +80,7 @@ async function watchServer(name, url, state) {
 async function runChecks(state) {
   await watchServer("netcheckgate", "https://netcheckgate.falix.org", state);
   await watchServer("bot-hosting", "https://79pzovvqil.apps.bot-hosting.cloud", state);
-  await watchServer("veosmp2", "http://195.201.153.149:20506", state);
+  await watchServer("veosmp2", "https://jahangir.falix.org", state);
   await watchBotkeep(state);
 }
 
